@@ -74,3 +74,44 @@ object VolleyFactory {
 - **Volley**: Uses `RequestQueue` and `StringRequest` to handle network requests with a listener.
 
 ---
+
+##retrofit
+```
+interface ProductApi {
+
+    @GET("products")
+    suspend fun getProducts(): List<Product>
+
+}
+
+object RetrofitInstance {
+
+    private const val BASE_URL = "https://fakestoreapi.com/"
+
+    private val json = Json {
+        ignoreUnknownKeys = true
+        prettyPrint = true
+        isLenient = true
+    }
+
+    private val logging = HttpLoggingInterceptor().apply {
+        level = HttpLoggingInterceptor.Level.BODY
+    }
+
+    private val client = OkHttpClient.Builder()
+        .addInterceptor(logging)
+        .build()
+
+    val api: ProductApi = Retrofit.Builder()
+        .baseUrl(BASE_URL)
+        .client(client)
+        .addConverterFactory(
+            json.asConverterFactory(
+                "application/json".toMediaType()
+            )
+        )
+        .build()
+        .create(ProductApi::class.java)
+
+}
+```
